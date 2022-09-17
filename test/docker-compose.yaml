@@ -1,0 +1,34 @@
+version: "3.7"
+services:
+  database:
+    image: postgres
+    restart: always
+    env_file: auth_db.env
+    ports:
+      - "5431:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+  auth_srvc:
+    build:
+      context: ../../backend-auth
+      dockerfile: Dockerfile
+    env_file: auth_srvc.env
+    depends_on: 
+      - database
+    networks:
+      - default
+    ports:
+      - "16001:16001"
+  api_gateway:
+    build:
+      context: ../../backend-api
+      dockerfile: Dockerfile
+    env_file: api_gateway.env
+    depends_on: 
+      - database
+    networks:
+      - default
+    ports:
+      - "3000:3000"
+volumes:
+  data:
